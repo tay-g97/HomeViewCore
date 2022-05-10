@@ -21,8 +21,8 @@ namespace HomeView.Models.Account
         public string Accounttype { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public bool Marketingemail { get; set; }
-        public bool Marketingphone { get; set; }
+        public bool MarketingEmail { get; set; }
+        public bool MarketingPhone { get; set; }
         public string ProfilepictureUrl { get; set; }
         public string Token { get; set; }
     }

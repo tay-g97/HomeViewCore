@@ -51,9 +51,9 @@ namespace HomeView.Models.Account
         [MaxLength(15, ErrorMessage = "Must be 6-15 characters")]
         public string Phone { get; set; }
         [Required(ErrorMessage = "Email preferences are required")]
-        public bool Marketingemail { get; set; }
+        public bool MarketingEmail { get; set; }
         [Required(ErrorMessage = "Phone preferences are required")]
-        public bool Marketingphone { get; set; }
+        public bool MarketingPhone { get; set; }
         public string ProfilepictureUrl { get; set; }
     }
 }
