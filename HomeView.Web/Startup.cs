@@ -38,6 +38,7 @@ namespace HomeView.Web
             services.AddScoped<ITokenService, TokenService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IPropertyRepository, PropertyRepository>();
 
             services.AddIdentityCore<UserIdentity>(options =>
                 {
