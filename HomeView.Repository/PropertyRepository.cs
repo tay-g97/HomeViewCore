@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using HomeView.Models.Property;
@@ -11,45 +12,91 @@ namespace HomeView.Repository
 {
     public class PropertyRepository : IPropertyRepository
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _config;
 
-        public PropertyRepository(IConfiguration configuration)
+        public PropertyRepository(IConfiguration config)
         {
-            this.configuration = configuration;
+            _config = config;
         }
 
-        public async Task<List<Property>> SearchProperties(PropertySearch propertySearch)
+        public async Task<Property> GetAsync(int propertyId)
         {
+            Property property;
 
-            var dataTable = new DataTable();
-            dataTable.Columns.Add("Location", typeof(string));
-            dataTable.Columns.Add("PropertyType", typeof(string));
-            dataTable.Columns.Add("Keywords", typeof(string));
-            dataTable.Columns.Add("MinPrice", typeof(int));
-            dataTable.Columns.Add("MaxPrice", typeof(int));
-            dataTable.Columns.Add("MinBeds", typeof(int));
-            dataTable.Columns.Add("MaxBeds", typeof(int));
-
-            dataTable.Rows.Add(
-                propertySearch.Location,
-                propertySearch.PropertyType,
-                propertySearch.Keywords,
-                propertySearch.MinPrice,
-                propertySearch.MaxPrice,
-                propertySearch.MinBeds,
-                propertySearch.MaxBeds
-            );
-            IEnumerable<Property> properties;
-            using (var connection = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
             {
                 await connection.OpenAsync();
 
-              properties = await connection.QueryAsync<Property>("Property_Search",
-                    new { PropertySearch = dataTable.AsTableValuedParameter("dbo.PropertySearchType") },
+                property = await connection.QueryFirstOrDefaultAsync<Property>(
+                    "Property_Get",
+                    new {PropertyId = propertyId},
                     commandType: CommandType.StoredProcedure);
             }
 
-            return properties.ToList();
+            return property;
+        }
+
+        public async Task<Property> InsertAsync(PropertyCreate propertyCreate, int userId)
+        {
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("PropertyId", typeof(int));
+            dataTable.Columns.Add("Propertyname", typeof(string));
+            dataTable.Columns.Add("GuidePrice", typeof(decimal));
+            dataTable.Columns.Add("Propertytype", typeof(string));
+            dataTable.Columns.Add("Description", typeof(string));
+            dataTable.Columns.Add("Bedrooms", typeof(int));
+            dataTable.Columns.Add("Bathrooms", typeof(int));
+            dataTable.Columns.Add("Icons", typeof(string));
+            dataTable.Columns.Add("Addressline1", typeof(string));
+            dataTable.Columns.Add("Addressline2", typeof(string));
+            dataTable.Columns.Add("Addressline3", typeof(string));
+            dataTable.Columns.Add("Town", typeof(string));
+            dataTable.Columns.Add("City", typeof(string));
+            dataTable.Columns.Add("Postcode", typeof(string));
+            dataTable.Columns.Add("Photo1Id", typeof(int));
+            dataTable.Columns.Add("Photo2Id", typeof(int));
+            dataTable.Columns.Add("Photo3Id", typeof(int));
+            dataTable.Columns.Add("Photo4Id", typeof(int));
+            dataTable.Columns.Add("Photo5Id", typeof(int));
+
+            dataTable.Rows.Add(
+                propertyCreate.PropertyId,
+                propertyCreate.Propertyname,
+                propertyCreate.Guideprice,
+                propertyCreate.Propertytype,
+                propertyCreate.Description,
+                propertyCreate.Bedrooms,
+                propertyCreate.Bathrooms,
+                propertyCreate.Icons,
+                propertyCreate.Addressline1,
+                propertyCreate.Addressline2,
+                propertyCreate.Addressline3,
+                propertyCreate.Town,
+                propertyCreate.City,
+                propertyCreate.Postcode,
+                propertyCreate.Photo1Id,
+                propertyCreate.Photo2Id,
+                propertyCreate.Photo3Id,
+                propertyCreate.Photo4Id,
+                propertyCreate.Photo5Id
+            );
+
+            int newPropertyId;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                newPropertyId = await connection.ExecuteScalarAsync<int>(
+                    "Property_Insert",
+                    new {Property = dataTable.AsTableValuedParameter("dbo.PropertyType"), UserId = userId},
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+
+            Property property = await GetAsync(newPropertyId);
+
+            return property;
         }
     }
 }

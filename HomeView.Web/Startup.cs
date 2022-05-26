@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HomeView.Identity;
 using HomeView.Models.Account;
+using HomeView.Models.Settings;
 using HomeView.Repository;
 using HomeView.Services;
 using HomeView.Web.Extensions;
@@ -35,9 +36,15 @@ namespace HomeView.Web
         {
             //services.AddRazorPages();
 
+            services.Configure<CloudinaryOptions>(Configuration.GetSection("CloudinaryOptions"));
+
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPhotoService, PhotoService>();
+
 
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IPhotoRepository, PhotoRepository>();
+            services.AddScoped<IPropertyRepository, PropertyRepository>();
 
             services.AddIdentityCore<UserIdentity>(options =>
                 {

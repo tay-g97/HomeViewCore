@@ -443,3 +443,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+HomeView.Web/appsettings.json
+*.editorconfig
+*.cache
+*.json
