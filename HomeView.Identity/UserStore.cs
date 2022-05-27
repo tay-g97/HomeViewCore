@@ -104,17 +104,17 @@ namespace HomeView.Identity
             return Task.FromResult(0);
         }
 
-        public async Task<UserIdentity> FindByIdAsync(int userId, CancellationToken cancellationToken)
-        {
-            return await _accountRepository.GetByIdAsync(userId, cancellationToken);
-        }
-
         public Task<IdentityResult> DeleteAsync(UserIdentity user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         public Task<UserIdentity> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserIdentity> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
