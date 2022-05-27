@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "aijDqEALg4zKZ+cvzH71gT62IAAl5HB6QjCRoPljbq0tnu9mi43+759PHIVoTspUaG7KKA/zt3ibjBxnaN4GQQ==",
+  "dgSpecHash": "u8/2eZER7qSnwXk1U/PGr8XAxpMYQVQfUHWYcqeCg344ZJqaErEbnWMbjQtVi9PtrTkKgzn+2+WntKaOBfSdDA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Henry\\Desktop\\HomeView\\HomeView.Web\\HomeView.Web.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Henry\\.nuget\\packages\\cloudinarydotnet\\1.17.0\\cloudinarydotnet.1.17.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\3.1.24\\microsoft.aspnetcore.authentication.jwtbearer.3.1.24.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\6.0.4\\microsoft.aspnetcore.cryptography.internal.6.0.4.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\6.0.4\\microsoft.aspnetcore.cryptography.keyderivation.6.0.4.nupkg.sha512",
+    "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
+    "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
+    "C:\\Users\\Henry\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\6.0.0\\microsoft.extensions.dependencyinjection.6.0.0.nupkg.sha512",
@@ -17,6 +21,7 @@
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.options\\6.0.0\\microsoft.extensions.options.6.0.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512",
+    "C:\\Users\\Henry\\.nuget\\packages\\microsoft.extensions.webencoders\\5.0.3\\microsoft.extensions.webencoders.5.0.3.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\6.17.0\\microsoft.identitymodel.jsonwebtokens.6.17.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.identitymodel.logging\\6.17.0\\microsoft.identitymodel.logging.6.17.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\microsoft.identitymodel.protocols\\5.5.0\\microsoft.identitymodel.protocols.5.5.0.nupkg.sha512",
@@ -39,7 +44,8 @@
     "C:\\Users\\Henry\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\Henry\\.nuget\\packages\\system.security.cryptography.cng\\4.5.0\\system.security.cryptography.cng.4.5.0.nupkg.sha512",
-    "C:\\Users\\Henry\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
+    "C:\\Users\\Henry\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
+    "C:\\Users\\Henry\\.nuget\\packages\\system.text.encodings.web\\5.0.0\\system.text.encodings.web.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

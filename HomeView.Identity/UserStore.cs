@@ -29,6 +29,11 @@ namespace HomeView.Identity
             return await _accountRepository.GetByUsernameAsync(normalizedUserName, cancellationToken);
         }
 
+        public Task<UserIdentity> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<string> GetEmailAsync(UserIdentity user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.Email);
@@ -110,11 +115,6 @@ namespace HomeView.Identity
         }
 
         public Task<UserIdentity> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserIdentity> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

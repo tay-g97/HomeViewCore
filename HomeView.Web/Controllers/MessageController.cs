@@ -1,10 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using HomeView.Models.Account;
 using HomeView.Models.Message;
 using HomeView.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeView.Web.Controllers
@@ -15,11 +17,13 @@ namespace HomeView.Web.Controllers
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IPhotoRepository _photoRepository;
+        private readonly UserManager<UserIdentity> _userManager;
 
-        public MessageController(IMessageRepository messageRepository, IPhotoRepository photoRepository)
+        public MessageController(IMessageRepository messageRepository, IPhotoRepository photoRepository, UserManager<UserIdentity> userManager)
         {
             _messageRepository = messageRepository;
             _photoRepository = photoRepository;
+            _userManager = userManager;
         }
 
         [Authorize]
@@ -27,7 +31,7 @@ namespace HomeView.Web.Controllers
         public async Task<ActionResult<Message>> Create(MessageCreate messageCreate, int receiverId)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
-
+            var userIdentity = await _userManager.FindByIdAsync(userId.ToString());
             var message = await _messageRepository.InsertAsync(messageCreate, userId, receiverId);
 
             return Ok(message);
