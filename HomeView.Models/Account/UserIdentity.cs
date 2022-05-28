@@ -26,6 +26,6 @@ namespace HomeView.Models.Account
         public string Phone { get; set; }
         public bool MarketingEmail { get; set; }
         public bool MarketingPhone { get; set; }
-        public string ProfilepictureUrl { get; set; }
+        public int? ProfilepictureId { get; set; }
     }
 }

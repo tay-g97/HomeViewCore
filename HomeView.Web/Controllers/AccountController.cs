@@ -43,7 +43,7 @@ namespace HomeView.Web.Controllers
                 Phone = userCreate.Phone,
                 MarketingEmail = userCreate.MarketingEmail,
                 MarketingPhone = userCreate.MarketingPhone,
-                ProfilepictureUrl = userCreate.ProfilepictureUrl
+                ProfilepictureId = userCreate.ProfilepictureId
 
             };
 
@@ -69,7 +69,7 @@ namespace HomeView.Web.Controllers
                     Phone = userIdentity.Phone,
                     MarketingEmail = userIdentity.MarketingEmail,
                     MarketingPhone = userIdentity.MarketingPhone,
-                    ProfilepictureUrl = userIdentity.ProfilepictureUrl,
+                    ProfilepictureId = userIdentity.ProfilepictureId,
                     Token = _tokenService.CreateToken(userIdentity)
                 };
 
@@ -112,7 +112,7 @@ namespace HomeView.Web.Controllers
                         Phone = userIdentity.Phone,
                         MarketingEmail = userIdentity.MarketingEmail,
                         MarketingPhone = userIdentity.MarketingPhone,
-                        ProfilepictureUrl = userIdentity.ProfilepictureUrl,
+                        ProfilepictureId = userIdentity.ProfilepictureId,
                         Token = _tokenService.CreateToken(userIdentity)
                     };
 
@@ -120,7 +120,7 @@ namespace HomeView.Web.Controllers
                 }
             }
 
-            return BadRequest("Invalid login attempt.");
+            return Unauthorized("Invalid login attempt.");
         }
     }
 }

@@ -43,7 +43,7 @@ namespace HomeView.Repository
             dataTable.Columns.Add("Phone", typeof(string));
             dataTable.Columns.Add("MarketingEmail", typeof(bool));
             dataTable.Columns.Add("MarketingPhone", typeof(bool));
-            dataTable.Columns.Add("ProfilePictureUrl", typeof(string));
+            dataTable.Columns.Add("ProfilePictureId", typeof(int));
 
             dataTable.Rows.Add(
                 user.Username,
@@ -64,7 +64,7 @@ namespace HomeView.Repository
                 user.Phone,
                 user.MarketingEmail,
                 user.MarketingPhone,
-                user.ProfilepictureUrl
+                user.ProfilepictureId
             );
 
             using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))

@@ -54,6 +54,6 @@ namespace HomeView.Models.Account
         public bool MarketingEmail { get; set; }
         [Required(ErrorMessage = "Phone preferences are required")]
         public bool MarketingPhone { get; set; }
-        public string ProfilepictureUrl { get; set; }
+        public int? ProfilepictureId { get; set; }
     }
 }
