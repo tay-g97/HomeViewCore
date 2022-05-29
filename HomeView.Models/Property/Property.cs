@@ -9,5 +9,8 @@ namespace HomeView.Models.Property
         public int UserId { get; set; }
         public string Username { get; set; }
         public DateTime PublishDate { get; set; }
+        public int? PhotoId { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? PublicId { get; set; }
     }
 }

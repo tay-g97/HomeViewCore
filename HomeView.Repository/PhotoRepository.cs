@@ -54,7 +54,7 @@ namespace HomeView.Repository
             return photo;
         }
 
-        public async Task<Photo> InsertAsync(PhotoCreate photoCreate, int userId, int propertyId)
+        public async Task<Photo> InsertAsync(PhotoCreate photoCreate, int userId, int propertyId, bool thumbnail)
         {
             var dataTable = new DataTable();
             dataTable.Columns.Add("PublicId", typeof(string));
@@ -74,7 +74,8 @@ namespace HomeView.Repository
                     {
                         Photo = dataTable.AsTableValuedParameter("dbo.PhotoType"),
                         UserId = userId,
-                        PropertyId = propertyId
+                        Thumbnail = thumbnail,
+                        PropertyId = propertyId,
                     },
                     commandType: CommandType.StoredProcedure);
             }
