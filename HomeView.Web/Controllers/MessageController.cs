@@ -75,5 +75,30 @@ namespace HomeView.Web.Controllers
 
             return Ok(messages);
         }
+
+        [Authorize]
+        [HttpDelete("delete/{messageId}")]
+        public async Task<ActionResult<int>> Delete(int messageId)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+
+            var foundMessage = await _messageRepository.GetAsync(messageId);
+
+            if (foundMessage == null)
+            {
+                return NotFound("Message doesn't exist");
+            }
+
+            if (foundMessage.ReceiverId == userId)
+            {
+                var affectedRows = await _messageRepository.DeleteAsync(messageId);
+
+                return Ok("Deleted " + affectedRows + " Rows");
+            }
+
+
+            return Unauthorized("You did not receive this message");
+
+        }
     }
 }

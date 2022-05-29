@@ -20,6 +20,23 @@ namespace HomeView.Repository
             _config = config;
         }
 
+        public async Task<int> DeleteAsync(int messageId)
+        {
+            int affectedRows = 0;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                affectedRows = await connection.ExecuteAsync(
+                    "Message_Delete",
+                    new { MessageId = messageId },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return affectedRows;
+        }
+
         public async Task<Message> GetAsync(int messageId)
         {
             Message message;

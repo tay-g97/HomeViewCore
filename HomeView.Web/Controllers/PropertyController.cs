@@ -50,5 +50,36 @@ namespace HomeView.Web.Controllers
 
             return properties;
         }
+
+        [Authorize]
+        [HttpDelete("delete/{propertyId}")]
+        public async Task<ActionResult<int>> Delete(int propertyId)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+
+            var foundProperty = await _propertyRepository.GetAsync(propertyId);
+            var foundImages = await _photoRepository.GetAllByPropertyIdAsync(propertyId);
+
+            if (foundProperty == null)
+            {
+                return NotFound("Property doesn't exist");
+            }
+
+            if (foundProperty.UserId == userId)
+            {
+                foreach (var item in foundImages)
+                {
+                    var affectedPhotoRows = await _photoRepository.DeleteAsync(item.PhotoId);
+                }
+
+                var affectedRows = await _propertyRepository.DeleteAsync(propertyId);
+
+                return Ok("Deleted "+affectedRows+" property rows and all property images");
+            }
+            
+            
+            return Unauthorized("You did not create this property");
+            
+        }
     }
 }

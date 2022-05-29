@@ -86,6 +86,38 @@ namespace HomeView.Web.Controllers
             return photos;
         }
 
+        [Authorize]
+        [HttpDelete("delete/{photoId}")]
+
+        public async Task<ActionResult<int>> Delete(int photoId)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+
+            var foundPhoto = await _photoRepository.GetAsync(photoId);
+
+            if (foundPhoto != null)
+            {
+                if (foundPhoto.UserId == userId)
+                {
+                    var deleteResult = await _photoService.DeletePhotoAsync(foundPhoto.PublicId);
+
+                    if (deleteResult.Error != null) return BadRequest(deleteResult.Error.Message);
+
+                    var affectedRows = await _photoRepository.DeleteAsync(foundPhoto.PhotoId);
+
+                    return Ok("Deleted "+affectedRows+" photos");
+                }
+                else
+                {
+                    return Unauthorized("Photo was not uploaded by the current user.");
+                }
+
+
+            }
+
+            return BadRequest("Photo does not exist");
+        }
+
 
 
     }

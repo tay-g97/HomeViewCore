@@ -8,6 +8,8 @@ namespace HomeView.Repository
 {
     public interface IPropertyRepository
     {
+        public Task<int> DeleteAsync(int propertyId);
+
         public Task<Property> InsertAsync(PropertyCreate propertyCreate, int userId);
 
         public Task<Property> GetAsync(int propertyId);

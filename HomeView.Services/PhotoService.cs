@@ -43,7 +43,11 @@ namespace HomeView.Services
 
         public async Task<DeletionResult> DeletePhotoAsync(string publicId)
         {
-            throw new NotImplementedException();
+            var deletionParams = new DeletionParams(publicId);
+
+            var result = await _cloudinary.DestroyAsync(deletionParams);
+
+            return result;
         }
     }
 }

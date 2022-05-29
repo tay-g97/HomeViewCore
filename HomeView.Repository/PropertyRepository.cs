@@ -23,6 +23,23 @@ namespace HomeView.Repository
             _photoRepository = photoRepository;
         }
 
+        public async Task<int> DeleteAsync(int propertyId)
+        {
+            int affectedRows = 0;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                affectedRows = await connection.ExecuteAsync(
+                    "Property_Delete",
+                    new { PropertyId = propertyId },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return affectedRows;
+        }
+
         public async Task<List<Property>> GetAllByIdAsync(int userId)
         {
             IEnumerable<Property> properties;

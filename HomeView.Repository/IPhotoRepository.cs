@@ -11,5 +11,6 @@ namespace HomeView.Repository
         public Task<Photo> GetAsync(int photoId);
         public Task<Photo> InsertAsync(PhotoCreate photoCreate, int userId, int propertyId, bool thumbnail);
         public Task<List<Photo>> GetAllByPropertyIdAsync(int propertyId);
+        public Task<int> DeleteAsync(int PhotoId);
     }
 }
