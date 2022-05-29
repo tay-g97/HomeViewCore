@@ -32,7 +32,7 @@ namespace HomeView.Repository
                 await connection.OpenAsync();
 
                 properties = await connection.QueryAsync<Property>(
-                    "Property_GetById",
+                    "Property_GetAllById",
                     new { UserId = userId },
                     commandType: CommandType.StoredProcedure);
             }

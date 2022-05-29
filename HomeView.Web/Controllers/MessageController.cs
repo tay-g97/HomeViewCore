@@ -1,11 +1,18 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using HomeView.Models.Message;
+using HomeView.Models.Property;
 using HomeView.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HomeView.Web.Controllers
 {
@@ -23,7 +30,7 @@ namespace HomeView.Web.Controllers
         }
 
         [Authorize]
-        [HttpPost("{receiverId}")]
+        [HttpPost("send/{receiverId}")]
         public async Task<ActionResult<Message>> Create(MessageCreate messageCreate, int receiverId)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
@@ -46,6 +53,27 @@ namespace HomeView.Web.Controllers
             }
 
             return Unauthorized("You are not authorized to view this message");
+        }
+
+        [Authorize]
+        [HttpGet("view/all/{userId}")]
+        public async Task<ActionResult> GetAllByIdAsync(int userId)
+        {
+            int currentUserId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+
+            if (userId != currentUserId)
+            {
+                return Unauthorized("You are not authorized to view these messages");
+            }
+
+            var messages = await _messageRepository.GetByUserIdAsync(userId);
+
+            if (messages.IsNullOrEmpty())
+            {
+                return NotFound("You have no messages");
+            }
+
+            return Ok(messages);
         }
     }
 }

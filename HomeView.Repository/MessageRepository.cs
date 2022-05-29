@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -34,6 +35,23 @@ namespace HomeView.Repository
             }
 
             return message;
+        }
+
+        public async Task<List<Message>> GetByUserIdAsync(int userId)
+        {
+            IEnumerable<Message> messages;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                messages = await connection.QueryAsync<Message>(
+                    "Message_GetAllById",
+                    new { UserId = userId },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return messages.ToList();
         }
 
         public async Task<Message> InsertAsync(MessageCreate messageCreate, int userId, int receiverId)
