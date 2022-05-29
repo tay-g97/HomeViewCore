@@ -18,12 +18,5 @@ namespace HomeView.Models.Property
         public string Town { get; set; }
         public string City { get; set; }
         public string Postcode { get; set; }
-        public int? Photo1Id { get; set; }
-        public int? Photo2Id { get; set; }
-        public int? Photo3Id { get; set; }
-        public int? Photo4Id { get; set; }
-        public int? Photo5Id { get; set; }
-
-
     }
 }

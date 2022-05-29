@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using HomeView.Models.Photo;
 using HomeView.Models.Property;
 using Microsoft.Extensions.Configuration;
 
@@ -13,10 +15,29 @@ namespace HomeView.Repository
     public class PropertyRepository : IPropertyRepository
     {
         private readonly IConfiguration _config;
+        private readonly IPhotoRepository _photoRepository;
 
-        public PropertyRepository(IConfiguration config)
+        public PropertyRepository(IConfiguration config, IPhotoRepository photoRepository)
         {
             _config = config;
+            _photoRepository = photoRepository;
+        }
+
+        public async Task<List<Property>> GetAllByIdAsync(int userId)
+        {
+            IEnumerable<Property> properties;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                properties = await connection.QueryAsync<Property>(
+                    "Property_GetById",
+                    new { UserId = userId },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return properties.ToList();
         }
 
         public async Task<Property> GetAsync(int propertyId)
@@ -53,11 +74,6 @@ namespace HomeView.Repository
             dataTable.Columns.Add("Town", typeof(string));
             dataTable.Columns.Add("City", typeof(string));
             dataTable.Columns.Add("Postcode", typeof(string));
-            dataTable.Columns.Add("Photo1Id", typeof(int));
-            dataTable.Columns.Add("Photo2Id", typeof(int));
-            dataTable.Columns.Add("Photo3Id", typeof(int));
-            dataTable.Columns.Add("Photo4Id", typeof(int));
-            dataTable.Columns.Add("Photo5Id", typeof(int));
 
             dataTable.Rows.Add(
                 propertyCreate.PropertyId,
@@ -73,12 +89,7 @@ namespace HomeView.Repository
                 propertyCreate.Addressline3,
                 propertyCreate.Town,
                 propertyCreate.City,
-                propertyCreate.Postcode,
-                propertyCreate.Photo1Id,
-                propertyCreate.Photo2Id,
-                propertyCreate.Photo3Id,
-                propertyCreate.Photo4Id,
-                propertyCreate.Photo5Id
+                propertyCreate.Postcode
             );
 
             int newPropertyId;

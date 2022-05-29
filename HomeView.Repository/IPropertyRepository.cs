@@ -11,5 +11,7 @@ namespace HomeView.Repository
         public Task<Property> InsertAsync(PropertyCreate propertyCreate, int userId);
 
         public Task<Property> GetAsync(int propertyId);
+
+        public Task<List<Property>> GetAllByIdAsync(int userId);
     }
 }

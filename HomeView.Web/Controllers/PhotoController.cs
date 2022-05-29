@@ -19,22 +19,31 @@ namespace HomeView.Web.Controllers
         private readonly IPhotoRepository _photoRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly IPhotoService _photoService;
+        private readonly IPropertyRepository _propertyRepository;
 
         public PhotoController(
             IPhotoRepository photoRepository,
             IAccountRepository accountRepository,
+            IPropertyRepository propertyRepository,
             IPhotoService photoService)
         {
             _photoRepository = photoRepository;
             _accountRepository = accountRepository;
+            _propertyRepository = propertyRepository;
             _photoService = photoService;
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<Photo>> UploadPhoto(IFormFile file)
+        [HttpPost("{propertyId}")]
+        public async Task<ActionResult<Photo>> UploadPhoto(IFormFile file, int propertyId)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+            var property = await _propertyRepository.GetAsync(propertyId);
+
+            if (userId != property.UserId)
+            {
+                return Unauthorized("You do not own this property listing");
+            }
 
             var uploadResult = await _photoService.AddPhotoAsync(file);
 
@@ -46,7 +55,7 @@ namespace HomeView.Web.Controllers
                 ImageUrl = uploadResult.SecureUrl.AbsoluteUri,
             };
 
-            var photo = await _photoRepository.InsertAsync(photoCreate, userId);
+            var photo = await _photoRepository.InsertAsync(photoCreate, userId, propertyId);
 
             return Ok(photo);
         }

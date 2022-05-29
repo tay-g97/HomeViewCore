@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -17,6 +18,23 @@ namespace HomeView.Repository
         public PhotoRepository(IConfiguration config)
         {
             _config = config;
+        }
+
+        public async Task<List<Photo>> GetAllByPropertyIdAsync(int propertyId)
+        {
+            IEnumerable<Photo> photos;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                photos = await connection.QueryAsync<Photo>(
+                    "Photo_GetByPropertyId",
+                    new { PropertyId = propertyId },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return photos.ToList();
         }
 
         public async Task<Photo> GetAsync(int photoId)
@@ -36,7 +54,7 @@ namespace HomeView.Repository
             return photo;
         }
 
-        public async Task<Photo> InsertAsync(PhotoCreate photoCreate, int userId)
+        public async Task<Photo> InsertAsync(PhotoCreate photoCreate, int userId, int propertyId)
         {
             var dataTable = new DataTable();
             dataTable.Columns.Add("PublicId", typeof(string));
@@ -55,7 +73,8 @@ namespace HomeView.Repository
                     new
                     {
                         Photo = dataTable.AsTableValuedParameter("dbo.PhotoType"),
-                        UserId = userId
+                        UserId = userId,
+                        PropertyId = propertyId
                     },
                     commandType: CommandType.StoredProcedure);
             }
