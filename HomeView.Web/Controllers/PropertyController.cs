@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HomeView.Web.Controllers
 {
@@ -80,6 +81,38 @@ namespace HomeView.Web.Controllers
             
             return Unauthorized("You did not create this property");
             
+        }
+
+        [Authorize]
+        [HttpPut("update/{propertyId}")]
+        public async Task<ActionResult<Property>> Update(PropertyCreate propertyCreate, int propertyId)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+            var foundProperty = await _propertyRepository.GetAsync(propertyId);
+
+            if (foundProperty.ToString().IsNullOrEmpty())
+            {
+                return NotFound("Property does not exist");
+            }
+
+
+            if (foundProperty.UserId == userId)
+            {
+                var property = await _propertyRepository.UpdateAsync(propertyCreate, propertyId, userId);
+
+                return Ok(property);
+            }
+
+            return Unauthorized("You did not create this property");
+
+
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<Property>>> PropertySearch(PropertySearch propertySearch)
+        {
+            var propertyList = await _propertyRepository.SearchProperties(propertySearch);
+            return Ok(propertyList);
         }
     }
 }

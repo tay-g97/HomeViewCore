@@ -126,5 +126,85 @@ namespace HomeView.Repository
 
             return property;
         }
+
+        public async Task<List<Property>> SearchProperties(PropertySearch propertySearch)
+        {
+            IEnumerable<Property> properties;
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                properties = await connection.QueryAsync<Property>("Property_Search",
+                    new
+                    {
+                        Location = propertySearch.Location,
+                        PropertyType = propertySearch.PropertyType,
+                        Keywords = propertySearch.Keywords,
+                        MinPrice = propertySearch.MinPrice,
+                        MaxPrice = propertySearch.MaxPrice,
+                        MinBeds = propertySearch.MinBeds,
+                        MaxBeds = propertySearch.MaxBeds
+                    },
+                    commandType: CommandType.StoredProcedure);
+            }
+
+            return properties.ToList();
+        }
+
+        public async Task<Property> UpdateAsync(PropertyCreate propertyCreate, int propertyId, int userId)
+        {
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("PropertyId", typeof(int));
+            dataTable.Columns.Add("Propertyname", typeof(string));
+            dataTable.Columns.Add("GuidePrice", typeof(decimal));
+            dataTable.Columns.Add("Propertytype", typeof(string));
+            dataTable.Columns.Add("Description", typeof(string));
+            dataTable.Columns.Add("Bedrooms", typeof(int));
+            dataTable.Columns.Add("Bathrooms", typeof(int));
+            dataTable.Columns.Add("Icons", typeof(string));
+            dataTable.Columns.Add("Addressline1", typeof(string));
+            dataTable.Columns.Add("Addressline2", typeof(string));
+            dataTable.Columns.Add("Addressline3", typeof(string));
+            dataTable.Columns.Add("Town", typeof(string));
+            dataTable.Columns.Add("City", typeof(string));
+            dataTable.Columns.Add("Postcode", typeof(string));
+
+            dataTable.Rows.Add(propertyCreate.PropertyId,
+                propertyCreate.Propertyname,
+                propertyCreate.Guideprice,
+                propertyCreate.Propertytype,
+                propertyCreate.Description,
+                propertyCreate.Bedrooms,
+                propertyCreate.Bathrooms,
+                propertyCreate.Icons,
+                propertyCreate.Addressline1,
+                propertyCreate.Addressline2,
+                propertyCreate.Addressline3,
+                propertyCreate.Town,
+                propertyCreate.City,
+                propertyCreate.Postcode);
+
+            var affectedRows = 0;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                affectedRows = await connection.ExecuteAsync(
+                    "Property_Update",
+                    new
+                    {
+                        Property = dataTable.AsTableValuedParameter("dbo.PropertyType"),
+                        PropertyId = propertyId,
+                        UserId = userId
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+
+            Property property = await GetAsync(propertyId);
+
+            return property;
+        }
     }
 }
