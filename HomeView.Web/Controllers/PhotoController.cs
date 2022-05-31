@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HomeView.Web.Controllers
 {
@@ -35,12 +36,13 @@ namespace HomeView.Web.Controllers
         }
 
         [Authorize]
-        [HttpPost("{propertyId}/{thumbnail:bool}")]
-        public async Task<ActionResult<Photo>> UploadPhoto(IFormFile file, int propertyId, bool thumbnail)
+        [HttpPost("{propertyId}")]
+        public async Task<ActionResult<Photo>> UploadPhoto(IFormFile file, int propertyId)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
             var property = await _propertyRepository.GetAsync(propertyId);
             var photoList = await _photoRepository.GetAllByPropertyIdAsync(propertyId);
+            var thumbnail = HttpContext.Request.Query["thumbnail"];
 
             foreach (var item in photoList)
             {
@@ -55,6 +57,11 @@ namespace HomeView.Web.Controllers
                 return Unauthorized("You do not own this property listing");
             }
 
+            if (thumbnail.IsNullOrEmpty())
+            {
+                thumbnail = "false";
+            }
+
             var uploadResult = await _photoService.AddPhotoAsync(file);
 
             if (uploadResult.Error != null) return BadRequest(uploadResult.Error.Message);
@@ -65,7 +72,7 @@ namespace HomeView.Web.Controllers
                 ImageUrl = uploadResult.SecureUrl.AbsoluteUri,
             };
 
-            var photo = await _photoRepository.InsertAsync(photoCreate, userId, propertyId, thumbnail);
+            var photo = await _photoRepository.InsertAsync(photoCreate, userId, propertyId, Convert.ToBoolean(thumbnail));
 
             return Ok(photo);
         }
