@@ -12,5 +12,6 @@ namespace HomeView.Repository
         public Task<Message> InsertAsync(MessageCreate messageCreate, int userId, int receiverId);
         public Task<List<Message>> GetByUserIdAsync(int userId);
         public Task<int> DeleteAsync(int messageId);
+        public Task<Message> UpdateAsync(int messageId, int replyId);
     }
 }

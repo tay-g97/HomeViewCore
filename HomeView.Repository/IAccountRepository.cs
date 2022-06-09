@@ -15,5 +15,9 @@ namespace HomeView.Repository
 
         public Task<UserIdentity> GetByUsernameAsync(string normalizedUsername,
             CancellationToken cancellationToken);
+
+        public Task<int> UpdatePictureAsync(int userId, int photoId);
+
+        public Task<string> GetUsernameByIdAsync(int userId);
     }
 }

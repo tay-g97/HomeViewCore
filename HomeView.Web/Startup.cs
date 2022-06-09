@@ -46,6 +46,7 @@ namespace HomeView.Web
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IProfilephotoRepository, ProfilephotoRepository>();
 
             services.AddIdentityCore<UserIdentity>(options =>
                 {

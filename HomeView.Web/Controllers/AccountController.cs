@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Threading.Tasks;
 using HomeView.Models.Account;
+using HomeView.Repository;
 using HomeView.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +18,17 @@ namespace HomeView.Web.Controllers
         private readonly ITokenService _tokenService;
         private readonly UserManager<UserIdentity> _userManager;
         private readonly SignInManager<UserIdentity> _signInManager;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IProfilephotoRepository _profilephotoRepository;
 
         public AccountController(ITokenService tokenService, UserManager<UserIdentity> userManager,
-            SignInManager<UserIdentity> signInManager)
+            SignInManager<UserIdentity> signInManager, IAccountRepository accountRepository, IProfilephotoRepository profilephotoRepository)
         {
             _tokenService = tokenService;
             _userManager = userManager;
             _signInManager = signInManager;
+            _accountRepository = accountRepository;
+            _profilephotoRepository = profilephotoRepository;
         }
 
         [HttpPost("register")]
@@ -122,5 +130,31 @@ namespace HomeView.Web.Controllers
 
             return Unauthorized("Invalid login attempt.");
         }
+
+        [Authorize]
+        [HttpPut("updatepicture/{photoId}")]
+        public async Task<ActionResult<int>> UpdatePicture(int photoId)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+            var selectedPicture = await _profilephotoRepository.GetAsync(photoId);
+
+            if (selectedPicture == null)
+            {
+                return NotFound("Picture does not exist");
+            }
+
+            var selectedPictureUserId = selectedPicture.UserId;
+            if (userId != selectedPictureUserId)
+            {
+                return Unauthorized("You do not own this picture");
+            }
+
+            var updatedPicture = await _accountRepository.UpdatePictureAsync(userId, photoId);
+
+            return Ok("Updated "+updatedPicture+" profile picture");
+        }
+
+
+
     }
 }

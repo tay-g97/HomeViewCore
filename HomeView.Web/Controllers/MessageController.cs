@@ -22,18 +22,37 @@ namespace HomeView.Web.Controllers
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IPhotoRepository _photoRepository;
+        private readonly IPropertyRepository _propertyRepository;
+        private readonly IAccountRepository _accountRepository;
 
-        public MessageController(IMessageRepository messageRepository, IPhotoRepository photoRepository)
+        public MessageController(IMessageRepository messageRepository, IPhotoRepository photoRepository, IPropertyRepository propertyRepository, IAccountRepository accountRepository)
         {
             _messageRepository = messageRepository;
             _photoRepository = photoRepository;
+            _propertyRepository = propertyRepository;
+            _accountRepository = accountRepository;
         }
 
         [Authorize]
         [HttpPost("send/{receiverId}")]
         public async Task<ActionResult<Message>> Create(MessageCreate messageCreate, int receiverId)
         {
+            var receiverUsername = await _accountRepository.GetUsernameByIdAsync(receiverId);
+            if (receiverUsername == null)
+                return NotFound("User does not exist");
+
+            var messagePropertyId = messageCreate.PropertyId;
+            var messageProperty = await _propertyRepository.GetAsync(messagePropertyId);
+            if (messageProperty == null)
+            {
+                return NotFound("Property does not exist");
+            }
+
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+            if (receiverId == userId)
+            {
+                return BadRequest("Cannot send a message to yourself");
+            }
 
             var message = await _messageRepository.InsertAsync(messageCreate, userId, receiverId);
 
@@ -46,6 +65,11 @@ namespace HomeView.Web.Controllers
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
             var message = await _messageRepository.GetAsync(messageId);
+
+            if (message == null)
+            {
+                return NotFound("Message not found");
+            }
 
             if (message.ReceiverId == userId | message.SenderId == userId)
             {
@@ -99,6 +123,30 @@ namespace HomeView.Web.Controllers
 
             return Unauthorized("You did not receive this message");
 
+        }
+
+        [Authorize]
+        [HttpPost("reply/{messageId}")]
+        public async Task<ActionResult<Message>> Reply(MessageCreate messageCreate, int messageId)
+        {
+            var replyMessage = await _messageRepository.GetAsync(messageId);
+            var receiverId = replyMessage.SenderId;
+            var replyPropertyId = replyMessage.PropertyId;
+            var receiverCheckId = replyMessage.ReceiverId;
+
+            int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+
+            if (userId != receiverCheckId)
+            {
+                return Unauthorized("You did not receive this message");
+            }
+
+            messageCreate.PropertyId = replyPropertyId;
+            var message = await _messageRepository.InsertAsync(messageCreate, userId, receiverId);
+
+            var updatedMessage = await _messageRepository.UpdateAsync(messageId, message.MessageId);
+
+            return Ok(message);
         }
     }
 }

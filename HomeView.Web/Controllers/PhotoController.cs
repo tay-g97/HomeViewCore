@@ -41,6 +41,12 @@ namespace HomeView.Web.Controllers
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
             var property = await _propertyRepository.GetAsync(propertyId);
+
+            if (property == null)
+            {
+                return NotFound("Property does not exist");
+            }
+
             var photoList = await _photoRepository.GetAllByPropertyIdAsync(propertyId);
             var thumbnail = HttpContext.Request.Query["thumbnail"];
 
@@ -88,9 +94,20 @@ namespace HomeView.Web.Controllers
         [HttpGet("property/{propertyId}")]
         public async Task<ActionResult<List<Photo>>> GetByPropertyId(int propertyId)
         {
+            var property = await _propertyRepository.GetAsync(propertyId);
+            if (property == null)
+            {
+                return NotFound("Property does not exist");
+            }
+
             var photos = await _photoRepository.GetAllByPropertyIdAsync((propertyId));
 
-            return photos;
+            if (photos.IsNullOrEmpty())
+            {
+                return NotFound("Property has no photos");
+            }
+
+            return Ok(photos);
         }
 
         [Authorize]
@@ -122,7 +139,7 @@ namespace HomeView.Web.Controllers
 
             }
 
-            return BadRequest("Photo does not exist");
+            return NotFound("Photo does not exist");
         }
 
 

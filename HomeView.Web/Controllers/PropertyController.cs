@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HomeView.Models.Property;
 using HomeView.Repository;
+using HomeView.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +20,15 @@ namespace HomeView.Web.Controllers
     {
         private readonly IPropertyRepository _propertyRepository;
         private readonly IPhotoRepository _photoRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IPhotoService _photoService;
 
-        public PropertyController(IPropertyRepository propertyRepository, IPhotoRepository photoRepository)
+        public PropertyController(IPropertyRepository propertyRepository, IPhotoRepository photoRepository, IAccountRepository accountRepository, IPhotoService photoService)
         {
             _propertyRepository = propertyRepository;
             _photoRepository = photoRepository;
+            _accountRepository = accountRepository;
+            _photoService = photoService;
         }
 
         [Authorize]
@@ -30,6 +36,12 @@ namespace HomeView.Web.Controllers
         public async Task<ActionResult<Property>> Create(PropertyCreate propertyCreate)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == JwtRegisteredClaimNames.NameId).Value);
+            string accountType = (User.Claims.First(i => i.Type == JwtRegisteredClaimNames.Typ).Value);
+
+            if (accountType != "Seller")
+            {
+                return Unauthorized("You do not have a seller account");
+            }
 
             var property = await _propertyRepository.InsertAsync(propertyCreate, userId);
 
@@ -41,15 +53,23 @@ namespace HomeView.Web.Controllers
         {
             var property = await _propertyRepository.GetAsync((propertyId));
 
-            return property;
+            if (property == null)
+                return NotFound("Property not found");
+
+            return Ok(property);
         }
 
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<List<Property>>> GetByUserId(int userId)
         {
+            var username = await _accountRepository.GetUsernameByIdAsync(userId);
+
+            if (username == null)
+                return NotFound("User does not exist");
+
             var properties = await _propertyRepository.GetAllByIdAsync((userId));
 
-            return properties;
+            return Ok(properties);
         }
 
         [Authorize]
@@ -70,12 +90,28 @@ namespace HomeView.Web.Controllers
             {
                 foreach (var item in foundImages)
                 {
-                    var affectedPhotoRows = await _photoRepository.DeleteAsync(item.PhotoId);
+                    var foundPhoto = await _photoRepository.GetAsync(item.PhotoId);
+
+                    if (foundPhoto != null)
+                    {
+                        if (foundPhoto.UserId == userId)
+                        {
+                            var deleteResult = await _photoService.DeletePhotoAsync(foundPhoto.PublicId);
+
+                            if (deleteResult.Error != null) return BadRequest(deleteResult.Error.Message);
+
+                            var affectedRows = await _photoRepository.DeleteAsync(foundPhoto.PhotoId);
+                        }
+                        else
+                        {
+                            return Unauthorized("Photo was not uploaded by the current user.");
+                        }
+
+
+                    }
                 }
 
-                var affectedRows = await _propertyRepository.DeleteAsync(propertyId);
-
-                return Ok("Deleted "+affectedRows+" property rows and all property images");
+                return Ok("Deleted property and all property images");
             }
             
             

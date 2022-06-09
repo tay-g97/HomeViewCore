@@ -97,5 +97,44 @@ namespace HomeView.Repository
 
             return user;
         }
+
+        public async Task<string> GetUsernameByIdAsync(int userId)
+        {
+            string username;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                username = await connection.QuerySingleOrDefaultAsync<string>(
+                    "Account_GetUsernameById", new { UserId = userId },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+
+            return username;
+        }
+
+        public async Task<int> UpdatePictureAsync(int userId, int photoId)
+        {
+            var affectedRows = 0;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                affectedRows = await connection.ExecuteAsync(
+                    "Account_UpdatePicture",
+                    new
+                    {
+                        UserId = userId,
+                        PhotoId = photoId
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+
+            return affectedRows;
+        }
     }
 }

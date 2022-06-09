@@ -107,5 +107,29 @@ namespace HomeView.Repository
 
             return message;
         }
+
+        public async Task<Message> UpdateAsync(int messageId, int replyId)
+        {
+            var affectedRows = 0;
+
+            using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                affectedRows = await connection.ExecuteAsync(
+                    "Message_Update",
+                    new
+                    {
+                        MessageId = messageId,
+                        ReplyId = replyId
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+
+            Message message = await GetAsync(messageId);
+
+            return message;
+        }
     }
 }
